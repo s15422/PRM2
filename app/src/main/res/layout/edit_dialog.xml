@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <EditText
+        android:id="@+id/txtChangeName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Change Name"
+        android:inputType="text"
+        tools:ignore="MissingConstraints"></EditText>
+
+    <EditText
+        android:id="@+id/txtChangeNote"
+        android:layout_width="411dp"
+        android:layout_height="114dp"
+        android:hint="Change Note"
+        android:inputType="text"
+        android:maxLength="500"
+        tools:ignore="MissingConstraints"></EditText>
+
+    <ImageView
+        android:id="@+id/placeImageView"
+        android:layout_width="match_parent"
+        android:layout_height="294dp"
+        app:srcCompat="@android:drawable/ic_menu_camera" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        tools:ignore="MissingConstraints">
+        <Button
+            android:id="@+id/dialogEditButton"
+            android:text="Edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#4CAF50"
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="2">
+        </Button>
+
+        <Button
+            android:id="@+id/dialogCancelButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#65416B9A"
+            android:text="Cancel"
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="120">
+        </Button>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/dialogDeleteButton"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="#F44336"
+        android:text="Delete Place"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2">
+    </Button>
+
+</LinearLayout>

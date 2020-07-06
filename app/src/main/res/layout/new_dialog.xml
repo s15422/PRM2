@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <EditText
+        android:id="@+id/txtPlaceName"
+        android:hint="Add Name"
+        android:inputType="text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="MissingConstraints">
+    </EditText>
+
+    <EditText
+        android:id="@+id/txtNote"
+        android:layout_width="392dp"
+        android:layout_height="138dp"
+        android:hint="Add Note"
+        android:inputType="text"
+        tools:ignore="MissingConstraints"></EditText>
+
+
+    <ImageView
+        android:id="@+id/newPictureView"
+        android:layout_width="396dp"
+        android:layout_height="310dp"
+        android:background="#FFFFFF"
+        android:foregroundGravity="center"
+        app:srcCompat="@android:drawable/ic_menu_camera" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        tools:ignore="MissingConstraints">
+
+        <Button
+            android:id="@+id/dialogAddButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#4CAF50"
+            android:text="Add"></Button>
+
+        <Button
+            android:id="@+id/dialogNewCancelButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#F44336"
+            android:text="Cancel"></Button>
+    </LinearLayout>
+
+</LinearLayout>

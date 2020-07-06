@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "792813626458",
+    "firebase_url": "https://prm-2-69d2b.firebaseio.com",
+    "project_id": "prm-2-69d2b",
+    "storage_bucket": "prm-2-69d2b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:792813626458:android:7aa188aed41fda950f2463",
+        "android_client_info": {
+          "package_name": "com.university.prm2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "792813626458-l80gjocvumvc4a6rq8qgp98sojjakaen.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDyl1WXrDXeHP78ti1xQmtFlGh4UOTvb2c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "792813626458-l80gjocvumvc4a6rq8qgp98sojjakaen.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
