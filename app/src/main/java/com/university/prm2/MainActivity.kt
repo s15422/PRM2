@@ -6,30 +6,42 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.university.prm2.DBHelper
+import com.google.firebase.storage.FileDownloadTask
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.details.*
 import kotlinx.android.synthetic.main.details.view.*
+import kotlinx.android.synthetic.main.details.view.detailsPictureView
+import kotlinx.android.synthetic.main.edit_dialog.*
 import kotlinx.android.synthetic.main.edit_dialog.view.*
+import kotlinx.android.synthetic.main.edit_dialog.view.txtChangeName
 import kotlinx.android.synthetic.main.new_dialog.view.*
+import java.io.ByteArrayOutputStream
+import java.io.File
 
 
 lateinit var dbHelper : DBHelper
 private lateinit var selectedImage: ImageView
-private lateinit var mUserReference: DatabaseReference
+private lateinit var selectedBitmap: Bitmap
+private lateinit var currentUser: DatabaseReference
 
 //Firebase references
 private var mDatabaseReference: DatabaseReference? = null
+private var mStorageRef: StorageReference? = null
 private var mDatabase: FirebaseDatabase? = null
 private var mAuth: FirebaseAuth? = null
 //UI elements
@@ -42,6 +54,7 @@ private var tvEmailVerifiied: TextView? = null
 class MainActivity : AppCompatActivity() {
     private val CAMERA_REQUEST = 1888
     private val MY_CAMERA_PERMISSION_CODE = 100
+    private var pictureAdded = false;
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,23 +67,31 @@ class MainActivity : AppCompatActivity() {
 
         // When you first run the app on a new device, sqlite DB does not have any "Places" inside
         // Uncomment the function call below to get inital data to the DB
-//        initialListFill();
+        initialListFill();
+
+
         val mUser = mAuth!!.currentUser
-        mUserReference = mDatabaseReference!!.child(mUser!!.uid)
+
+        mStorageRef = FirebaseStorage.getInstance().getReference()
+        currentUser = mDatabaseReference!!.child(mUser!!.uid)
         updateList(listView)
 
 
         mapBtn.setOnClickListener {
             startActivity(Intent(this, MapActivity::class.java))
         }
-
+// ******************************Details******************************************
         listView.setOnItemClickListener { parent, view, position, id ->
             val element = parent.getItemAtPosition(position) as Place
             val dialogView = LayoutInflater.from(this).inflate(R.layout.details, null)
+
             val mBuilder = AlertDialog.Builder(this)
                 .setView(dialogView)
                 .setTitle("Details of  " + element.name)
             val mAlertDialog = mBuilder.show()
+            mAlertDialog.placeNameTextView.setText(element.name)
+            mAlertDialog.placeDescrTextView.setText(element.desc)
+            mAlertDialog.detailsPictureView.setImageBitmap(downloadImage(element.name))
 
             dialogView.backBtn.setOnClickListener {
                 mAlertDialog.dismiss()
@@ -79,6 +100,7 @@ class MainActivity : AppCompatActivity() {
             //Need to put here replacement of TextView with element info
         }
 
+//        ************************Edit Data********************************8
             // LongClicking on a item in list to edit data
             listView.setOnItemLongClickListener { parent, view, position, id ->
                 val element = parent.getItemAtPosition(position) as Place
@@ -87,7 +109,10 @@ class MainActivity : AppCompatActivity() {
                     .setView(dialogView)
                     .setTitle("Edit info of " + element.name)
                 val mAlertDialog = mBuilder.show()
+                mAlertDialog.txtChangeName.setText(element.name)
+                mAlertDialog.txtChangeNote.setText(element.desc)
 
+                mAlertDialog.placeImageView.setImageBitmap(downloadImage(element.name))
 
 //            //Code for changing the picture of a place
                 selectedImage = mAlertDialog.findViewById(R.id.placeImageView)!!
@@ -124,7 +149,7 @@ class MainActivity : AppCompatActivity() {
                 true
             }
 
-
+// ******************************Add data***************************************************8
             // Adding a new Place
             addPlaceBtn.setOnClickListener {
                 val dialogView = LayoutInflater.from(this).inflate(R.layout.new_dialog, null)
@@ -152,7 +177,10 @@ class MainActivity : AppCompatActivity() {
                     mAlertDialog.dismiss()
                     val newName = dialogView.txtPlaceName.text.toString()
                     val newDescription = dialogView.txtNote.text.toString()
-                    dbHelper.insertPlace(Place(newName, newDescription, mUserReference.toString()))
+                    dbHelper.insertPlace(Place(newName, newDescription, currentUser.toString()))
+                    if (pictureAdded)
+                        uploadImage(selectedBitmap, newName)
+                    pictureAdded = false
                     updateList(listView)
                 }
 
@@ -176,7 +204,7 @@ class MainActivity : AppCompatActivity() {
         // Update the listView on the MainActivity
         @SuppressLint("SetTextI18n")
         private fun updateList(listView: ListView) {
-            val placeList = dbHelper.readAllfromUser(mUserReference.toString())
+            val placeList = dbHelper.readAllfromUser(currentUser.toString())
             val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, placeList)
             listView.adapter = adapter
             adapter.notifyDataSetChanged()
@@ -196,6 +224,8 @@ class MainActivity : AppCompatActivity() {
             if (requestCode == CAMERA_REQUEST) {
                 val img = data?.getExtras()?.get("data");
                 selectedImage.setImageBitmap(img as Bitmap?)
+                selectedBitmap = img as Bitmap
+                pictureAdded = true
             }
         }
 
@@ -218,7 +248,7 @@ class MainActivity : AppCompatActivity() {
 //        tvEmail!!.text = mUser.email
 //        tvEmailVerifiied!!.text = mUser.isEmailVerified.toString()
 
-            mUserReference.addValueEventListener(object : ValueEventListener {
+            currentUser.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
 //                user.getUid.value as String
 //                tvLastName!!.text = snapshot.child("lastName").value as String
@@ -228,4 +258,42 @@ class MainActivity : AppCompatActivity() {
             })
         }
 
+    fun uploadImage(bitmap: Bitmap, placeName: String) {
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val data: ByteArray = baos.toByteArray()
+        val storage = FirebaseStorage.getInstance()
+        val storageRef =
+            storage.getReferenceFromUrl("gs://prm-2-69d2b.appspot.com")
+        val imagesRef = storageRef.child("images/$placeName.jpg")
+        imagesRef.putBytes(data)
+
     }
+
+    fun downloadImage( placeName: String) : Bitmap {
+        val storage = FirebaseStorage.getInstance()
+        val storageRef =
+            storage.getReferenceFromUrl("gs://prm-2-69d2b.appspot.com")
+        val imagesRef = storageRef.child("images/$placeName.jpg")
+        val localFile = File.createTempFile("images", "jpg");
+        var result: Bitmap = Bitmap.createBitmap(1024,1024,Bitmap.Config.ARGB_8888)
+
+        imagesRef.getFile(localFile)
+            .addOnSuccessListener(OnSuccessListener<FileDownloadTask.TaskSnapshot?> {
+                result = BitmapFactory.decodeFile(localFile.absolutePath);
+            }).addOnFailureListener(OnFailureListener {
+
+            })
+
+
+//        imagesRef.getBytes(1024*1024)
+//            .addOnSuccessListener(OnSuccessListener<ByteArray?> {
+//                result = BitmapFactory.decodeByteArray(it, 0 , it!!.size)
+//            }).addOnFailureListener(OnFailureListener {
+//
+//            })
+        return result
+
+    }
+
+}

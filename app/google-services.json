@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "792813626458-6i039oapa9crnvp30811ailvusbqg2d7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.university.prm2",
+            "certificate_hash": "365878efa0dfd80da785b34251f189f55cee3559"
+          }
+        },
+        {
           "client_id": "792813626458-l80gjocvumvc4a6rq8qgp98sojjakaen.apps.googleusercontent.com",
           "client_type": 3
         }

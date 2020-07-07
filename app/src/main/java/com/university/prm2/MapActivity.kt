@@ -1,10 +1,12 @@
 package com.university.prm2
 
+import android.content.Intent
 import android.os.Bundle
 //import com.example.places.R
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Transformations.map
@@ -27,6 +29,12 @@ class MapActivity :  OnMapReadyCallback, FragmentActivity() {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        val listBtn = findViewById<Button>(R.id.listBtn)
+        listBtn.setOnClickListener {
+            finish()
+            startActivity(Intent(this, MainActivity::class.java))
+        }
     }
 //
 
